@@ -22,9 +22,9 @@ const app = {};
 
 // testing file system
 // TODO: will remove latter
-data.delete("test", "newFile", (err, data) => {
-  console.log(err, data);
-});
+// data.delete("test", "newFile", (err, data) => {
+//   console.log(err, data);
+// });
 
 /* 
   COMMENT: create server
