@@ -74,8 +74,8 @@ handler._token.post = (requestProperties, callBack) => {
 handler._token.get = (requestProperties, callBack) => {
   // check if token id is valid
   const id =
-    typeof requestProperties?.requestProperties?.id === "string" &&
-    requestProperties.requestProperties.id.trim().length === 20
+    typeof requestProperties?.id === "string" &&
+    requestProperties.id.trim().length === 20
       ? requestProperties.requestProperties.id
       : false;
   if (id) {
@@ -96,7 +96,50 @@ handler._token.get = (requestProperties, callBack) => {
     });
   }
 };
-handler._token.put = (requestProperties, callBack) => {};
+handler._token.put = (requestProperties, callBack) => {
+  // check if token id is valid
+  const id =
+    typeof requestProperties?.body?.id === "string" &&
+    requestProperties.body?.id.trim().length === 20
+      ? requestProperties.body?.id
+      : false;
+
+  const extend =
+    typeof requestProperties?.body?.extend === "boolean" &&
+    requestProperties.body?.extend === true
+      ? true
+      : false;
+
+  if (id && extend) {
+    data.read("token", id, (err, tokenData) => {
+      let tokenObject = parsedJSON(tokenData);
+      if (tokenObject.expires > Date.now()) {
+        tokenObject.expires = Date.now() + 60 * 60 * 1000;
+
+        //   store the updated token
+        data.update("token", id, (error) => {
+          if (!error) {
+            callBack(200, {
+              message: "Token was updated successfully",
+            });
+          } else {
+            callBack(500, {
+              error: "Server side error",
+            });
+          }
+        });
+      } else {
+        callBack(400, {
+          error: "Token already expired",
+        });
+      }
+    });
+  } else {
+    callBack(404, {
+      error: "There was a problem in your request",
+    });
+  }
+};
 handler._token.delete = (requestProperties, callBack) => {};
 
 module.exports = handler;
