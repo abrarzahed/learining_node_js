@@ -71,7 +71,31 @@ handler._token.post = (requestProperties, callBack) => {
     });
   }
 };
-handler._token.get = (requestProperties, callBack) => {};
+handler._token.get = (requestProperties, callBack) => {
+  // check if token id is valid
+  const id =
+    typeof requestProperties?.requestProperties?.id === "string" &&
+    requestProperties.requestProperties.id.trim().length === 20
+      ? requestProperties.requestProperties.id
+      : false;
+  if (id) {
+    data.read("token", id, (err, token) => {
+      const tokenObj = { ...parsedJSON(token) };
+      if (!err && tokenObj) {
+        delete tokenObj.password;
+        callBack(200, tokenObj);
+      } else {
+        callBack(404, {
+          error: "Requested token was not found",
+        });
+      }
+    });
+  } else {
+    callBack(404, {
+      error: "Requested token was not found",
+    });
+  }
+};
 handler._token.put = (requestProperties, callBack) => {};
 handler._token.delete = (requestProperties, callBack) => {};
 
