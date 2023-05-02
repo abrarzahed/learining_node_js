@@ -1,17 +1,20 @@
 const express = require("express");
-const handle = require("./handles");
 
 const app = express();
 
-app.all("/", (req, res) => {
-  console.log("Welcome to homepage");
-  res.send("This is home page");
-});
+app.set("view engine", "ejs");
 
-app.post("/", (req, res) => {
-  console.log(req.body);
-  res.send("This is express post request");
-});
+app
+  .route("/about/mission")
+  .get((req, res) => {
+    res.render("index");
+  })
+  .post((req, res) => {
+    res.send("This is home page post");
+  })
+  .put((req, res) => {
+    res.send("This is home page put");
+  });
 
 app.listen(3000, () => {
   console.log("express app is running on port 3000");
