@@ -10,6 +10,7 @@
 const data = require("../../lib/data");
 const { hash } = require("../../helpers/utilities");
 const { parsedJSON } = require("../../helpers/utilities");
+const tokenHandler = require("./tokenHandler");
 
 /* 
   COMMENT: module scaffolding
@@ -91,6 +92,32 @@ handler._users.post = (requestProperties, callBack) => {
   }
 };
 handler._users.get = (requestProperties, callBack) => {
+  // verify token
+  let token =
+    typeof requestProperties.headersObject.token === "string"
+      ? requestProperties.headersObject.token
+      : false;
+
+  tokenHandler._token.verify(token, phone, (tokenId) => {
+    if (tokenId) {
+      data.read("users", phone, (err, user) => {
+        const userObj = { ...parsedJSON(user) };
+        if (!err && userObj) {
+          delete userObj.password;
+          callBack(200, user);
+        } else {
+          callBack(404, {
+            error: "Requested user was not found",
+          });
+        }
+      });
+    } else {
+      callBack(403, {
+        error: "Authentication failed",
+      });
+    }
+  });
+
   // check if phone number is valid
   const phone =
     typeof requestProperties?.requestProperties?.phone === "string" &&
@@ -98,17 +125,6 @@ handler._users.get = (requestProperties, callBack) => {
       ? requestProperties.requestProperties.phone
       : false;
   if (phone) {
-    data.read("users", phone, (err, user) => {
-      const userObj = { ...parsedJSON(user) };
-      if (!err && userObj) {
-        delete userObj.password;
-        callBack(200, user);
-      } else {
-        callBack(404, {
-          error: "Requested user was not found",
-        });
-      }
-    });
   } else {
     callBack(404, {
       error: "Requested user was not found",
