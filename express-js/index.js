@@ -1,6 +1,12 @@
 const express = require("express");
+const handle = require("./handles");
 
 const app = express();
+const admin = express();
+
+app.use("/admin", admin);
+
+// app.locals.title = "My App";
 
 // app.use(
 //   express.static(`${__dirname}/public/`, {
@@ -8,13 +14,22 @@ const app = express();
 //   })
 // );
 
-const router = express.Router({
-  caseSensitive: true,
-});
-app.use(router);
+// const router = express.Router({
+//   caseSensitive: true,
+// });
+// app.use(router);
 
-router.get("/about", (req, res) => {
-  res.send("This is home page. Express it!");
+// admin.on("mount", function (parent) {
+//   console.log("Admin Mounted");
+//   console.log(parent); // refers to the parent app
+// });
+
+admin.get("/dashboard", (req, res) => {
+  console.log(admin.mountpath);
+  res.send("welcome to dashboard");
+});
+app.get("/", (req, res) => {
+  console.log("Welcome to homepage");
 });
 
 app.post("/", (req, res) => {
