@@ -140,6 +140,39 @@ handler._token.put = (requestProperties, callBack) => {
     });
   }
 };
-handler._token.delete = (requestProperties, callBack) => {};
+handler._token.delete = (requestProperties, callBack) => {
+  const id =
+    typeof requestProperties?.phone === "string" &&
+    requestProperties.id.trim().length === 20
+      ? requestProperties.id
+      : false;
+
+  if (id) {
+    // lookup the user
+    data.read("token", id, (err, tokenData) => {
+      if (!err && tokenData) {
+        data.delete("token", id, (err) => {
+          if (!err) {
+            callBack(200, {
+              message: "Token was successfully deleted",
+            });
+          } else {
+            callBack(500, {
+              error: "There was a problem in server side",
+            });
+          }
+        });
+      } else {
+        callBack(500, {
+          error: "There was a problem in server side",
+        });
+      }
+    });
+  } else {
+    callBack(400, {
+      error: "There was a problem deleting user",
+    });
+  }
+};
 
 module.exports = handler;
