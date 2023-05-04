@@ -1,6 +1,6 @@
-const handle = (req, res) => {
-  console.log(req.app.locals.title);
-  res.send("This is home page. Express it!");
+const handler = (req, res) => {
+  console.log(req.accepts("html"));
+  res.send("Hello world");
 };
 
-module.exports = handle;
+module.exports = handler;
